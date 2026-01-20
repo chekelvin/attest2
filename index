@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MICE 產業 AI 應用力評估</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'Microsoft JhengHei', sans-serif; }
+        .step { display: none; }
+        .step.active { display: block; }
+        .tool-btn.selected {
+            background-color: #4f46e5;
+            border-color: #4f46e5;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        <!-- Header -->
+        <div class="bg-indigo-700 p-8 text-white text-center">
+            <h1 class="text-2xl font-bold tracking-tight">MICE 產業 AI 應用力評估</h1>
+            <p class="text-indigo-200 mt-2 text-sm">測測你在會展策劃中的「AI 智慧指數」</p>
+        </div>
+
+        <!-- Content Area -->
+        <div class="p-8" id="quiz-container">
+            
+            <!-- Step 1: Start/User Info -->
+            <div id="step-start" class="step active space-y-6">
+                <div class="bg-indigo-50 p-4 rounded-xl flex items-center gap-4 border border-indigo-100">
+                    <i data-lucide="clipboard-check" class="w-10 h-10 text-indigo-500"></i>
+                    <p class="text-sm text-indigo-900 leading-relaxed font-medium">本測驗將評估您在專案規劃、設計創意、行銷及執行階段對 AI 工具的運用能力。</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">您的姓名/暱稱</label>
+                            <input type="text" id="user-name" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="例如：王小明">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">職位職級</label>
+                            <select id="user-role" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="">請選擇</option>
+                                <option value="會展總監 (Director)">會展總監 (Director)</option>
+                                <option value="項目經理 (PM)">項目經理 (PM)</option>
+                                <option value="業務推廣 (Sales)">業務推廣 (Sales)</option>
+                                <option value="活動執行 (Operations)">活動執行 (Operations)</option>
+                                <option value="視覺設計 (Design)">視覺設計 (Design)</option>
+                                <option value="行銷公關 (PR/Marketing)">行銷公關 (PR/Marketing)</option>
+                                <option value="行政財務 (Admin)">行政財務 (Admin)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">您曾使用過的 AI 軟體 (多選)</label>
+                        <div class="grid grid-cols-2 gap-2" id="ai-tools-grid">
+                            <!-- Tools will be injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="startQuiz()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-200 transition-all transform hover:scale-[1.01] flex items-center justify-center gap-2">
+                    進入測驗 <i data-lucide="chevron-right" size="20"></i>
+                </button>
+            </div>
+
+            <!-- Step 2: Questions -->
+            <div id="step-questions" class="step space-y-6">
+                <div class="flex justify-between items-center text-xs font-bold text-gray-400">
+                    <span id="question-counter">QUESTION 1 OF 10</span>
+                    <div class="w-24 bg-gray-100 h-2 rounded-full overflow-hidden">
+                        <div id="progress-bar" class="bg-indigo-500 h-full transition-all duration-300" style="width: 10%"></div>
+                    </div>
+                </div>
+                
+                <h2 id="question-text" class="text-xl font-bold text-gray-800 leading-snug">問題載入中...</h2>
+                
+                <div class="space-y-3" id="options-container">
+                    <!-- Options will be injected here -->
+                </div>
+            </div>
+
+            <!-- Step 3: Result -->
+            <div id="step-result" class="step text-center space-y-6">
+                <div class="flex justify-center" id="result-icon"></div>
+                <div class="space-y-2">
+                    <h2 class="text-xs uppercase tracking-[0.2em] text-indigo-500 font-black">評估結果等級</h2>
+                    <h3 id="result-level" class="text-4xl font-black text-gray-900">結果計算中</h3>
+                </div>
+
+                <div class="bg-slate-50 p-6 rounded-3xl text-left border border-slate-200 space-y-4 shadow-inner">
+                    <div class="flex items-start gap-3">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5 text-indigo-600 mt-1 flex-shrink-0"></i>
+                        <p class="text-gray-700 leading-relaxed text-sm"><strong>得分概況：</strong> <span id="result-desc"></span></p>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <i data-lucide="lightbulb" class="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0"></i>
+                        <p class="text-gray-700 leading-relaxed text-sm"><strong>學習建議：</strong> <span id="result-advice"></span></p>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <h4 id="personal-recommendation-title" class="font-bold text-gray-800 text-sm mb-4">專屬加值方案：</h4>
+                    <div class="grid grid-cols-2 gap-3 text-xs text-left">
+                        <div class="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+                            <span class="font-bold block text-indigo-800 mb-1">強化重點</span>
+                            <span id="focus-area"></span>
+                        </div>
+                        <div class="p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+                            <span class="font-bold block text-indigo-800 mb-1">掌握程度</span>
+                            已初步接觸 <span id="tools-count">0</span> 個 AI 工具
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="location.reload()" class="mt-6 text-gray-400 hover:text-indigo-600 text-sm font-medium transition-colors">
+                    重新進行測試
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 py-4 border-t text-center text-[10px] text-gray-400 uppercase tracking-widest font-bold">
+            Confidential © Exhibition Team AI Maturity Audit
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentStep = 'start';
+        let currentQuestionIdx = 0;
+        let totalScore = 0;
+        let selectedTools = [];
+
+        const aiTools = ['ChatGPT', 'Claude', 'Gemini', 'Midjourney', 'Canva AI', 'DeepL', 'Gamma (簡報)', 'Fireflies (會議記錄)', 'Copilot', 'Suno/Runway (影音)'];
+
+        const questions = [
+            {
+                question: "當你需要為一場新的醫療器材展撰寫 30 頁的企劃書大綱時，你會怎麼做？",
+                options: [
+                    { text: "完全手寫，參考過去公司的範本", score: 0 },
+                    { text: "先用 ChatGPT 生成框架，再由自己填入細節", score: 10 },
+                    { text: "利用 AI 生成完整草案，並要求它模擬政府標案的口吻修正", score: 15 },
+                    { text: "不知道 AI 可以幫忙寫企劃書", score: 0 }
+                ]
+            },
+            {
+                question: "客戶要求在 1 小時內提供三個不同風格的攤位視覺概念（Moodboard），你的做法是？",
+                options: [
+                    { text: "在 Pinterest 或 Google 找圖並拼貼", score: 5 },
+                    { text: "使用 Midjourney 或 DALL-E 根據關鍵字生成獨一無二的概念圖", score: 15 },
+                    { text: "告知客戶時間太短，無法提供", score: 0 },
+                    { text: "自己用 Photoshop 趕工做簡單合成", score: 5 }
+                ]
+            },
+            {
+                question: "活動結束後有 500 份出席者的開放式問卷回饋，你需要快速總結建議：",
+                options: [
+                    { text: "逐一閱讀並手動分類關鍵字", score: 0 },
+                    { text: "將資料餵給 Claude 或 ChatGPT 進一步分析情緒與具體改善點", score: 15 },
+                    { text: "只看前 20 份作為代表性結論", score: 0 },
+                    { text: "使用 Excel 的篩選功能做基礎統計", score: 5 }
+                ]
+            },
+            {
+                question: "你需要將一份中文的展覽手冊翻譯成專業的英文與日文：",
+                options: [
+                    { text: "使用 Google 翻譯並直接貼上", score: 5 },
+                    { text: "請翻譯公司處理，但需要等待 3 天", score: 0 },
+                    { text: "使用 DeepL 或 AI 工具翻譯，並要求 AI 以「會展產業術語」進行校對", score: 15 },
+                    { text: "自己憑印象翻譯", score: 0 }
+                ]
+            },
+            {
+                question: "關於「提示詞工程 (Prompt Engineering)」，你是否了解其重要性？",
+                options: [
+                    { text: "聽過，但不確定怎麼操作", score: 5 },
+                    { text: "非常了解，知道如何使用「角色設定」、「限制條件」來優化結果", score: 15 },
+                    { text: "沒聽過，我都隨便問問", score: 0 }
+                ]
+            },
+            {
+                question: "如果你需要製作一個 15 頁的贊助商招商簡報（Pitch Deck）：",
+                options: [
+                    { text: "打開 PowerPoint 從空白頁開始排版", score: 0 },
+                    { text: "使用 Gamma 或 Tome 等 AI 工具快速生成內容與排版初稿", score: 15 },
+                    { text: "請設計同事幫忙排版", score: 5 },
+                    { text: "使用現成的舊 PPT 範本改字", score: 5 }
+                ]
+            },
+            {
+                question: "需要為展覽在 FB/IG 上連續發布 7 天的行銷貼文，你的策略是？",
+                options: [
+                    { text: "每天當場想當天發什麼", score: 0 },
+                    { text: "使用 AI 生成一週的內容日曆，並要求它根據不同受眾調整口吻", score: 15 },
+                    { text: "參考競爭對手的文案，稍微改寫", score: 5 },
+                    { text: "全部交給外包公關公司，不參與內容製作", score: 0 }
+                ]
+            },
+            {
+                question: "活動現場需要一段 30 秒的開場快剪影片：",
+                options: [
+                    { text: "請攝影剪輯師連夜趕工，可能來不及", score: 0 },
+                    { text: "使用 AI 影片工具（如 Runway 或 Canva AI）快速合成過場動畫與特效", score: 15 },
+                    { text: "用簡單的投影片播放照片代替", score: 5 },
+                    { text: "不安排開場影片", score: 0 }
+                ]
+            },
+            {
+                question: "在長達 2 小時的跨國籌備會議後，你需要整理詳細紀錄：",
+                options: [
+                    { text: "邊聽錄音邊打字，耗費 3 小時整理", score: 0 },
+                    { text: "使用 Fireflies 或 Otter 等 AI 自動轉錄並總結待辦事項", score: 15 },
+                    { text: "只憑印象寫下幾個大點", score: 5 },
+                    { text: "請行政同事幫忙整理", score: 5 }
+                ]
+            },
+            {
+                question: "面對展覽大量重複的參加者查詢（如交通、時間），你會？",
+                options: [
+                    { text: "安排人工客服逐一回覆 Email", score: 0 },
+                    { text: "訓練一個 AI Chatbot 並掛載在官網/LINE，處理 80% 的常見問題", score: 15 },
+                    { text: "在網站放一個超長的 PDF FAQ 讓使用者自己找", score: 5 },
+                    { text: "不處理這類詢問，等現場再說", score: 0 }
+                ]
+            }
+        ];
+
+        // Init UI
+        function init() {
+            lucide.createIcons();
+            const grid = document.getElementById('ai-tools-grid');
+            aiTools.forEach(tool => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'tool-btn flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all border bg-white border-gray-200 text-gray-600 hover:border-indigo-300';
+                btn.innerHTML = `<span class="check-icon hidden"><i data-lucide="check" size="14"></i></span><span class="spacer w-[14px]"></span> ${tool}`;
+                btn.onclick = () => toggleTool(btn, tool);
+                grid.appendChild(btn);
+            });
+            lucide.createIcons();
+        }
+
+        function toggleTool(btn, tool) {
+            const index = selectedTools.indexOf(tool);
+            if (index > -1) {
+                selectedTools.splice(index, 1);
+                btn.classList.remove('selected');
+                btn.querySelector('.check-icon').classList.add('hidden');
+                btn.querySelector('.spacer').classList.remove('hidden');
+            } else {
+                selectedTools.push(tool);
+                btn.classList.add('selected');
+                btn.querySelector('.check-icon').classList.remove('hidden');
+                btn.querySelector('.spacer').classList.add('hidden');
+            }
+        }
+
+        function startQuiz() {
+            const name = document.getElementById('user-name').value;
+            const role = document.getElementById('user-role').value;
+            if (!name || !role) {
+                alert('請先填寫基本資訊喔！');
+                return;
+            }
+            showStep('questions');
+            renderQuestion();
+        }
+
+        function showStep(stepId) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step-' + stepId).classList.add('active');
+            currentStep = stepId;
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestionIdx];
+            document.getElementById('question-counter').innerText = `QUESTION ${currentQuestionIdx + 1} OF ${questions.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentQuestionIdx + 1) / questions.length) * 100}%`;
+            document.getElementById('question-text').innerText = q.question;
+            
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-5 border-2 border-gray-100 rounded-2xl hover:border-indigo-500 hover:bg-indigo-50 transition-all group flex items-start gap-4";
+                btn.innerHTML = `
+                    <div class="w-6 h-6 rounded-full bg-gray-100 flex-shrink-0 flex items-center justify-center group-hover:bg-indigo-500 transition-colors">
+                      <span class="text-xs font-bold text-gray-400 group-hover:text-white">${String.fromCharCode(65 + idx)}</span>
+                    </div>
+                    <span class="text-gray-700 font-medium leading-relaxed group-hover:text-indigo-900">${opt.text}</span>
+                `;
+                btn.onclick = () => handleAnswer(opt.score);
+                container.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(score) {
+            totalScore += score;
+            if (currentQuestionIdx + 1 < questions.length) {
+                currentQuestionIdx++;
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            const maxScore = 150;
+            const percentage = (totalScore / maxScore) * 100;
+            const userName = document.getElementById('user-name').value;
+            const userRole = document.getElementById('user-role').value;
+            
+            let level, desc, advice, icon, focus;
+            
+            if (percentage >= 80) {
+                level = "AI 領航員 (Expert)";
+                desc = "你已經是會展界的 AI 高手！能精準利用工具提升產值。";
+                advice = "作為領軍人物，建議開始研究 AI 自動化工作流（如 Zapier/Make 連接 AI），並在團隊中推動 AI SOP 的建立。";
+                icon = '<i data-lucide="zap" class="w-12 h-12 text-yellow-500"></i>';
+                focus = "跨工具自動化流程";
+            } else if (percentage >= 50) {
+                level = "AI 實踐者 (Practitioner)";
+                desc = "你已經開始使用 AI 輔助工作，但還有很大的發揮空間。";
+                advice = "建議深化 Prompt 技巧，嘗試將 AI 應用於跨部門協作（如設計與項目的對接）。您可以多嘗試多模態工具來進一步縮短製作週期。";
+                icon = '<i data-lucide="award" class="w-12 h-12 text-blue-500"></i>';
+                focus = "多樣化 Prompt 技巧";
+            } else {
+                level = "AI 新手 (Novice)";
+                desc = "你對 AI 的潛力還在探索階段，目前多依賴傳統方式工作。";
+                advice = "建議從每日的小任務開始（如讓 AI 潤飾回信、整理會議筆記）。先建立「先問 AI」的習慣，你會發現工作效率顯著提升。";
+                icon = '<i data-lucide="book-open" class="w-12 h-12 text-green-500"></i>';
+                focus = "基礎指令與對話實作";
+            }
+
+            document.getElementById('result-icon').innerHTML = icon;
+            document.getElementById('result-level').innerText = level;
+            document.getElementById('result-desc').innerText = desc;
+            document.getElementById('result-advice').innerText = advice;
+            document.getElementById('personal-recommendation-title').innerText = `給 ${userName} 的 ${userRole} AI 加值方案：`;
+            document.getElementById('focus-area').innerText = focus;
+            document.getElementById('tools-count').innerText = selectedTools.length;
+            
+            showStep('result');
+            lucide.createIcons();
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
